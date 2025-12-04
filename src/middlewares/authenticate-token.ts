@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken'
 import type { Response, NextFunction } from 'express'
-import { authenticated_request } from '../../types/authenticated';
-import { authenticated_user } from '../../types/authenticated';
+import { authenticated_request } from '../types/authenticated';
+import { authenticated_user } from '../types/authenticated';
 
 export const authenticate_token = async (req: authenticated_request, res: Response, next: NextFunction) => {
   const auth_headers = req.headers['authorization'];

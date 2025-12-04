@@ -21,7 +21,7 @@ const user_model = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Task'
   }],
-  date_crated: {
+  date_created: {
     type: Date,
     default: Date.now()
   }
