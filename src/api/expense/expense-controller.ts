@@ -1,18 +1,17 @@
-import { Schema, model } from 'mongoose';
+import { Request, Response } from 'express'
+import expense_model from './expense-model';
+import user_model from '../user/user-model';
+import { async_handler } from '../../utils/async_handler';
+import { error_response } from '../../utils/error-response';
 
-const expense_model = new Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  amount: {
-    type: Number,
-    required: true
-  },
-  created_at: {
-    type: Date,
-    default: Date.now()
-  },
+export const create_expense = async_handler((req: Request, res: Response) => {
+  const { name, price, photo } = req.body
 })
 
-export default model('Expense', expense_model)
+export const edit_expense = async_handler((req: Request, res: Response) => {
+  
+})
+
+export const delete_expense = async_handler((req: Request, res: Response) => {
+  
+})
