@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import { connect_to_db } from './utils/db';
 import user_route from './api/user/user-route';
 import { error_handler } from './middlewares/error';
+import expense_route from './api/expense/expense-route';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(helmet());
 connect_to_db();
 
 app.use('/api/user', user_route);
+app.use('/api/expense', expense_route)
 
 // ERROR HANDLER MUST BE LAST
 app.use(error_handler);
