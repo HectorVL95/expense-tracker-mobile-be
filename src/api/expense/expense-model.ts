@@ -10,7 +10,7 @@ const expense_model = new Schema({
     required: true
   },
   photo: {
-    type: File,
+    type: String,
     required: false
   },
   owner_id: {
@@ -22,7 +22,7 @@ const expense_model = new Schema({
     default: Date.now()
   },
   location: {
-    type: Location,
+    type: String,
     required: true
   }
 })

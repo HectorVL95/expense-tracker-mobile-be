@@ -9,3 +9,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 
 })
+
+export const upload_to_cloudinary = async(file: Express.Multer.File, folder: string ) => {
+  return new Promise<string>((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      {folder},
+      (error, result) => {
+        if (error) return reject(error)
+          resolve(result!.secure_url)
+      }
+    ).end(file.buffer)
+  })
+}
