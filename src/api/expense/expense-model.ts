@@ -28,3 +28,12 @@ const expense_model = new Schema({
 })
 
 export default model('Expense', expense_model)
+
+expense_model.post('save', async function() {
+  const User = model('User')
+  const Expense = model('Expense')
+
+  await User.findByIdAndUpdate(this.owner_id, {
+    $addToSet: {expenses: this._id}
+  })
+})

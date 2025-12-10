@@ -8,12 +8,12 @@ import { authenticated_request } from '../../types/authenticated';
 import { Types } from 'mongoose';
 
 export const create_expense = async_handler(async(req: Request, res: Response) => {
-  const { name, price } = req.body
+  const { name, price, location } = req.body
   const { userId } = (req as authenticated_request).user!
 
   const photo = req.file as Express.Multer.File
 
-  const expense = await expense_model.create({name, price})
+  const expense = await expense_model.create({name, price, location})
 
   if (photo) {
     const image_url = await upload_to_cloudinary(photo, `expense/${expense._id}`)
@@ -34,10 +34,13 @@ export const create_expense = async_handler(async(req: Request, res: Response) =
 export const edit_expense = async_handler(async(req: Request, res: Response) => {
   const { id } = req.params
   const { name, price, photo, location } = req.body
+  const { userId } = (req as authenticated_request).user!
 
   const expense = await expense_model.findById(id)
 
   if (!expense) throw new error_response('Expense not found', 404)
+
+  if (expense.owner_id?.toString() !==  userId) throw new error_response('Only the owner can edit the expense', 401)
 
   const edited_expense = await expense?.updateOne({ name, price, photo, location })
   
@@ -50,10 +53,20 @@ export const edit_expense = async_handler(async(req: Request, res: Response) => 
 
 export const delete_expense = async_handler(async(req: Request, res: Response) => {
   const { id } = req.params
-  
-  const deleted_expense = await expense_model.findByIdAndDelete(id)
+  const { userId } = (req as authenticated_request).user!
 
-  if (!deleted_expense) throw new error_response('Expense does not exist', 404)
+  const owner = await user_model.findById(userId)
+  
+  const expense = await expense_model.findById(id)
+
+  if (!expense) throw new error_response('Expense does not exist', 404)
+
+  if (expense.owner_id!== owner?._id) throw new error_response('Only the owner can edit the expense', 401)
+
+  expense.deleteOne()
+  
+  owner?.expenses.filter(exp => exp._id === expense._id)
+  await owner?.save()
 
   res.status(200).json({
     success: true,
