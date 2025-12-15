@@ -18,13 +18,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: process.env.CORS }));
 app.use(helmet());
 
-
 connect_to_db();
 
 app.use('/api/user', user_route);
 app.use('/api/expense', expense_route)
 
-// ERROR HANDLER MUST BE LAST
 app.use(error_handler);
 
 app.listen(process.env.PORT, () => {

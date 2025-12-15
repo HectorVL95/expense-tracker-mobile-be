@@ -28,14 +28,12 @@ const user_model = new Schema({
   }
 })
 
-expense_model.post('findOneAndDelete', async function (doc:HydratedDocument<any> | null) {
-  if (!doc) return
-  const User = model('User')
+user_model.post('deleteMany', async function (doc) {
+  if (!doc) return;
 
-  await User.findByIdAndUpdate(doc.owner_id, {
-    $pull: {expenses: doc._id}
-  })
+  const Expense = model('Expense')
+  await Expense.deleteMany({owner_id: doc._id})
 })
 
-export default model('User', user_model)
 
+export default model('User', user_model)

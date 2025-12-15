@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, HydratedDocument } from 'mongoose';
 
 const expense_model = new Schema({
   name: {
@@ -27,13 +27,22 @@ const expense_model = new Schema({
   }
 })
 
-export default model('Expense', expense_model)
-
 expense_model.post('save', async function() {
   const User = model('User')
-  const Expense = model('Expense')
-
+  
   await User.findByIdAndUpdate(this.owner_id, {
     $addToSet: {expenses: this._id}
   })
 })
+
+expense_model.post('findOneAndDelete', async function (doc:HydratedDocument<any> | null) {
+  if (!doc) return
+  const User = model('User')
+
+  await User.findByIdAndUpdate(doc.owner_id, {
+    $pull: {expenses: doc._id}
+  })
+})
+
+export default model('Expense', expense_model)
+
