@@ -37,6 +37,8 @@ export const login_user = async_handler(async(req: Request, res: Response) => {
   if (!compared_password) throw new error_response('Passwords do not match', 403)
 
   const token = jwt.sign({userId: user._id, email:email }, process.env.JWT_SECRET!, {expiresIn: '9999999h', algorithm: 'HS256'})
+
+  console.log('success logged')
   
   res.status(200).json({
     success: true,
