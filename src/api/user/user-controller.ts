@@ -17,10 +17,13 @@ export const create_user = async_handler(async (req: Request, res: Response) => 
 
   if (!user)throw new error_response('Unable to create user', 401)
 
+  const token = jwt.sign({userId: user._id, email: email }, process.env.JWT_SECRET!, {expiresIn: '9999999h', algorithm: 'HS256'})
+
   res.status(200).json({
     success: true,
     message: 'Successfully created user',
-    data: user
+    data: user,
+    token
   })
 })
 
