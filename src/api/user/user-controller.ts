@@ -16,7 +16,6 @@ export const create_user = async_handler(async (req: Request, res: Response) => 
   const user = await user_model.create({first_name, last_name, email, password: ecnrypted_password})
 
   if (!user)throw new error_response('Unable to create user', 401)
-    console.log("BODY RECEIVED:", req.body);
 
   res.status(200).json({
     success: true,
@@ -32,11 +31,11 @@ export const login_user = async_handler(async(req: Request, res: Response) => {
 
   if (!user) throw new error_response('User not found', 404)
 
-  const compared_password = bcrypt.compare(password, user.password)
+  const compared_password = await bcrypt.compare(password, user.password)
 
   if (!compared_password) throw new error_response('Passwords do not match', 403)
 
-  const token = jwt.sign({userId: user._id, email:email }, process.env.JWT_SECRET!, {expiresIn: '9999999h', algorithm: 'HS256'})
+  const token = jwt.sign({userId: user._id, email: email }, process.env.JWT_SECRET!, {expiresIn: '9999999h', algorithm: 'HS256'})
 
   console.log('success logged')
   
