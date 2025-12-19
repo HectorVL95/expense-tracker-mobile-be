@@ -5,7 +5,7 @@ const expense_model = new Schema({
     type: String,
     required: true
   },
-  price: {
+  amount: {
     type: Number,
     required: true
   },
@@ -15,7 +15,8 @@ const expense_model = new Schema({
   },
   owner_id: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   },
   date_created: {
     type: Date,

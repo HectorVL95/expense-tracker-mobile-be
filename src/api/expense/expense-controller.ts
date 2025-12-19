@@ -8,18 +8,30 @@ import { authenticated_request } from '../../types/authenticated';
 import { Types } from 'mongoose';
 
 export const create_expense = async_handler(async(req: Request, res: Response) => {
-  const { name, price, date } = req.body
+  const { name, amount, date } = req.body
   const { userId } = (req as authenticated_request).user!
 
-  const photo = req.file as Express.Multer.File
+  const photo = req.file
 
-  const expense = await expense_model.create({name, price, date, owner_id: userId})
+  // if (photo) {
+  //   const image_url = await upload_to_cloudinary(photo, `expense/${expense._id}`)
+  //   expense.photo = image_url
+  //   await expense.save()
+  // }}
 
-  if (photo) {
-    const image_url = await upload_to_cloudinary(photo, `expense/${expense._id}`)
-    expense.photo = image_url
-    await expense.save()
+  const parsed_amount = Number(amount)
+  if (isNaN(parsed_amount)) {
+    throw new error_response('Enter a valida amount', 400)
   }
+
+  const parsed_date = new Date(date)
+  if (isNaN(parsed_date.getTime())) {
+    throw new error_response('Invalid date', 400)
+  }
+
+  const expense = await expense_model.create({name, amount: parsed_amount, date: parsed_date, owner_id: userId})
+
+  console.log('expense created')
 
   res.status(200).json({
     success: true,

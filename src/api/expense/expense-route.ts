@@ -5,7 +5,7 @@ import { upload } from '../../utils/multer'
 
 const expense_route = Router()
 
-expense_route.post('/create_expense', upload.single('photo'), authenticate_token, create_expense)
+expense_route.post('/create_expense', authenticate_token, create_expense)
 
 expense_route.patch('/edit_expense/:id', authenticate_token, edit_expense)
 
