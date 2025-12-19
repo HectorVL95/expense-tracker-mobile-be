@@ -8,12 +8,12 @@ import { authenticated_request } from '../../types/authenticated';
 import { Types } from 'mongoose';
 
 export const create_expense = async_handler(async(req: Request, res: Response) => {
-  const { name, price, location } = req.body
+  const { name, price, date } = req.body
   const { userId } = (req as authenticated_request).user!
 
   const photo = req.file as Express.Multer.File
 
-  const expense = await expense_model.create({name, price, location, owner_id: userId})
+  const expense = await expense_model.create({name, price, date, owner_id: userId})
 
   if (photo) {
     const image_url = await upload_to_cloudinary(photo, `expense/${expense._id}`)
@@ -52,8 +52,6 @@ export const delete_expense = async_handler(async(req: Request, res: Response) =
   const { id } = req.params
   const { userId } = (req as authenticated_request).user!
 
-  const owner = await user_model.findById(userId)
-  
   const expense = await expense_model.findById(id)
 
   if (!expense) throw new error_response('Expense does not exist', 404)
@@ -65,5 +63,21 @@ export const delete_expense = async_handler(async(req: Request, res: Response) =
   res.status(200).json({
     success: true,
     message: 'Expense deleted',
+  })
+})
+
+export const get_expenses = async_handler(async(req: Request, res: Response) => {
+  const { userId } = (req as authenticated_request).user!
+
+  const expenses = await expense_model.find({owner_id: userId})
+
+  if (!expenses) throw new error_response('User does not have expenses', 404)  
+
+  console.log(expenses)
+
+  res.status(200).json({
+    success: true,
+    message: 'Expenses found',
+    data: expenses
   })
 })
