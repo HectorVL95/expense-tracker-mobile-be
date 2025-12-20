@@ -85,8 +85,6 @@ export const get_expenses = async_handler(async(req: Request, res: Response) => 
 
   if (!expenses) throw new error_response('User does not have expenses', 404)  
 
-  console.log(expenses)
-
   res.status(200).json({
     success: true,
     message: 'Expenses found',
