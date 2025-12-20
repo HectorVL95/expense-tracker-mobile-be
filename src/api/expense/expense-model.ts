@@ -26,10 +26,6 @@ const expense_model = new Schema({
     type: String,
     required: false
   },
-  date: {
-    type: Date,
-    required:true
-  }
 })
 
 expense_model.post('save', async function() {

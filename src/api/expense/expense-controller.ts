@@ -80,14 +80,31 @@ export const delete_expense = async_handler(async(req: Request, res: Response) =
 
 export const get_expenses = async_handler(async(req: Request, res: Response) => {
   const { userId } = (req as authenticated_request).user!
+  const { last_7_days } = req.query
 
-  const expenses = await expense_model.find({owner_id: userId})
+  const query: any = {
+    owner_id: userId
+  }
 
-  if (!expenses) throw new error_response('User does not have expenses', 404)  
+  if (last_7_days) {
+    const seven_days_ago = new Date()
+    seven_days_ago.setDate(seven_days_ago.getDate() - 7)
+
+    query.date_created = {
+      $gte: seven_days_ago
+    }
+   
+  }
+  
+  const expenses = await expense_model.find(query).sort({ date_created: -1 })
+
+  if (!expenses.legnth) {
+    throw new error_response('User does not have expenses', 404)
+  }
 
   res.status(200).json({
     success: true,
-    message: 'Expenses found',
+    message: last_7_days ? 'Expenses from last 7 days found' : 'Expenses found',
     data: expenses
   })
 })

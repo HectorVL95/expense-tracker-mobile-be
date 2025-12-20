@@ -25,6 +25,10 @@ const user_model = new Schema({
   date_created: {
     type: Date,
     default: Date.now()
+  },
+  total_amount: {
+    type: Number,
+    default: 0,
   }
 })
 
