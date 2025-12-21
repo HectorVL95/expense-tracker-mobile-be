@@ -22,6 +22,10 @@ const expense_model = new Schema({
     type: Date,
     default: Date.now()
   },
+  date: {
+    type: Date,
+    default: Date.now()
+  },
   location: {
     type: String,
     required: false

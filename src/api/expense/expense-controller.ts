@@ -90,15 +90,14 @@ export const get_expenses = async_handler(async(req: Request, res: Response) => 
     const seven_days_ago = new Date()
     seven_days_ago.setDate(seven_days_ago.getDate() - 7)
 
-    query.date_created = {
+    query.date = {
       $gte: seven_days_ago
     }
-   
   }
   
-  const expenses = await expense_model.find(query).sort({ date_created: -1 })
+  const expenses = await expense_model.find(query).sort({ date: -1 })
 
-  if (!expenses.legnth) {
+  if (!expenses.length) {
     throw new error_response('User does not have expenses', 404)
   }
 
@@ -106,5 +105,20 @@ export const get_expenses = async_handler(async(req: Request, res: Response) => 
     success: true,
     message: last_7_days ? 'Expenses from last 7 days found' : 'Expenses found',
     data: expenses
+  })
+})
+
+export const get_single_expense = async_handler(async(req: Request, res: Response) => {
+  const {userId} = (req as authenticated_request).user!
+  const { id } = req.params
+
+  const expense = await expense_model.findOne({_id: id, owner_id: userId})
+
+  if (!expense) throw new error_response('could not find expense', 404)
+
+  res.status(200).json({
+    success: true,
+    message: 'Found single expense',
+    data: expense
   })
 })
