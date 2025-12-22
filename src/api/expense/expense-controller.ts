@@ -5,7 +5,6 @@ import { async_handler } from '../../utils/async_handler';
 import { error_response } from '../../utils/error-response';
 import { upload_to_cloudinary } from '../../config/cloudinary';
 import { authenticated_request } from '../../types/authenticated';
-import { Types } from 'mongoose';
 
 export const create_expense = async_handler(async(req: Request, res: Response) => {
   const { name, amount, date } = req.body
@@ -42,7 +41,7 @@ export const create_expense = async_handler(async(req: Request, res: Response) =
 
 export const edit_expense = async_handler(async(req: Request, res: Response) => {
   const { id } = req.params
-  const { name, price, photo, location } = req.body
+  const { name, amount, date } = req.body
   const { userId } = (req as authenticated_request).user!
 
   const expense = await expense_model.findById(id)
@@ -51,7 +50,7 @@ export const edit_expense = async_handler(async(req: Request, res: Response) => 
 
   if (expense.owner_id?.toString() !==  userId) throw new error_response('Only the owner can edit the expense', 401)
 
-  const edited_expense = await expense?.updateOne({ name, price, photo, location })
+  const edited_expense = await expense?.updateOne({ name, date, amount })
   
   res.status(200).json({
     success: true,
@@ -101,10 +100,16 @@ export const get_expenses = async_handler(async(req: Request, res: Response) => 
     throw new error_response('User does not have expenses', 404)
   }
 
+  const amounts_only = expenses.map(exp => exp.amount)
+
+  const amounts_sum = amounts_only.reduce((a, b) => {
+    return a + b
+  }, 0)
+
   res.status(200).json({
     success: true,
     message: last_7_days ? 'Expenses from last 7 days found' : 'Expenses found',
-    data: expenses
+    data: expenses, amounts_sum
   })
 })
 
