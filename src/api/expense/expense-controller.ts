@@ -12,13 +12,8 @@ export const create_expense = async_handler(async(req: Request, res: Response) =
 
   const photo = req.file
 
-  // if (photo) {
-  //   const image_url = await upload_to_cloudinary(photo, `expense/${expense._id}`)
-  //   expense.photo = image_url
-  //   await expense.save()
-  // }}
-
   const parsed_amount = Number(amount)
+
   if (isNaN(parsed_amount)) {
     throw new error_response('Enter a valida amount', 400)
   }
@@ -29,6 +24,12 @@ export const create_expense = async_handler(async(req: Request, res: Response) =
   }
 
   const expense = await expense_model.create({name, amount: parsed_amount, date: parsed_date, owner_id: userId})
+
+  if (photo) {
+    const image_url = await upload_to_cloudinary(photo, `expense/${expense._id}`)
+    expense.photo = image_url
+    await expense.save()
+  }
 
   console.log('expense created')
 
@@ -44,13 +45,22 @@ export const edit_expense = async_handler(async(req: Request, res: Response) => 
   const { name, amount, date } = req.body
   const { userId } = (req as authenticated_request).user!
 
+  const photo = req.file
+
   const expense = await expense_model.findById(id)
 
   if (!expense) throw new error_response('Expense not found', 404)
 
   if (expense.owner_id?.toString() !==  userId) throw new error_response('Only the owner can edit the expense', 401)
 
-  const edited_expense = await expense?.updateOne({ name, date, amount })
+  if (photo) {
+    const  image_url = await upload_to_cloudinary(photo, `expenses/${expense._id}`)
+    expense.photo = image_url
+
+    await expense.save()
+  }
+
+  const edited_expense = await expense?.updateOne({ name, date, amount, photo })
   
   res.status(200).json({
     success: true,
